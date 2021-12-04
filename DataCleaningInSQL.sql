@@ -119,4 +119,39 @@ SET SoldAsVacant = CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
 		   END
 
 --Romove duplicates
+
+With RowNumCTE As(
+SELECT *,
+	ROW_NUMBER() OVER (
+	PARTITION BY ParcelID,
+							PropertyAddress,
+							SaleDate,
+							SalePrice,
+							LegalReference
+							ORDER BY
+								UniqueID
+								) row_num
+FROM PortfolioProject..NashvilleHousing
+--HAVING MAX(row_num) > 1
+--ORDER BY ParcelID
+)
+SELECT * 
+FROM RowNumCTE
+WHERE row_num > 1
+ORDER BY PropertyAddress
+
+DELETE
+FROM RowNumCTE
+WHERE row_num > 1
+--ORDER BY PropertyAddress
+
+
+
+SELECT *
+FROM PortfolioProject..NashvilleHousing
+
+
 --delete unused columns
+
+ALTER TABLE PortfolioProject..NashvilleHousing
+DROP COLUMN PropertyAddress
